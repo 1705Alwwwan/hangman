@@ -8,7 +8,7 @@ const playAgainBtn = document.getElementById('play-again');
 
 const figureParts = document.querySelectorAll('.figure-part');
 
-const words = ['PEMROGRAMAN', 'KOMPUTER', 'INTERNET', 'BELAJAR', 'KODE', 'WEBSITE', 'DATABASE', 'KOMODO', 'SISIR', 'TV', 'RADIO'];
+const words = ['SEMANGKA', 'KOMPUTER', 'NANAS', 'KIJANG', 'KOMODO', 'FILM', 'SINGKONG', 'KUDANIL', 'HARIMAU', 'TV', 'LAPANGAN'];
 let selectedWord = words[Math.floor(Math.random() * words.length)];
 
 const correctLetters = [];
