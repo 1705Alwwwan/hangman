@@ -11,6 +11,7 @@ permissions:
 
 env:
   IMAGE_NAME: ghcr.io/1705alwwwan/hangman
+  KUBECONFIG: /home/alwan/.kube/config
 
 jobs:
   build:
@@ -20,7 +21,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Login to GHCR
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -40,16 +41,55 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
+      - name: Verify Kubernetes Connection
+        env:
+          KUBECONFIG: /home/alwan/.kube/config
+        run: |
+          echo "Current Context:"
+          kubectl config current-context
+
+          echo ""
+          echo "Cluster Info:"
+          kubectl cluster-info
+
+          echo ""
+          echo "Nodes:"
+          kubectl get nodes
+
       - name: Apply Kubernetes Manifest
+        env:
+          KUBECONFIG: /home/alwan/.kube/config
         run: |
           kubectl apply -f k3s/
 
       - name: Update Deployment Image
+        env:
+          KUBECONFIG: /home/alwan/.kube/config
         run: |
           kubectl set image deployment/hangman \
           hangman=${{ env.IMAGE_NAME }}:${{ github.sha }} \
           -n hangman
 
       - name: Wait Rollout
+        env:
+          KUBECONFIG: /home/alwan/.kube/config
         run: |
           kubectl rollout status deployment/hangman -n hangman
+
+      - name: Show Pods
+        env:
+          KUBECONFIG: /home/alwan/.kube/config
+        run: |
+          kubectl get pods -n hangman -o wide
+
+      - name: Show Service
+        env:
+          KUBECONFIG: /home/alwan/.kube/config
+        run: |
+          kubectl get svc -n hangman
+
+      - name: Show Ingress
+        env:
+          KUBECONFIG: /home/alwan/.kube/config
+        run: |
+          kubectl get ingress -n hangman
