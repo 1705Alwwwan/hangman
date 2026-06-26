@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: hangman
+  namespace: hangman
+
+spec:
+  ingressClassName: traefik
+
+  rules:
+    - host: hangman.lab.local
+
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+
+            backend:
+              service:
+                name: hangman
+                port:
+                  number: 80

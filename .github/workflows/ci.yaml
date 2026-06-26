@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: |
+          docker build -t hangman:v1 .
+
+      - name: Save Docker Image
+        run: |
+          docker save hangman:v1 -o hangman.tar
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hangman-image
+          path: hangman.tar
