@@ -1,30 +1,40 @@
 name: CI
 
 on:
+
   push:
+
     branches:
+
       - main
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
+
   build:
 
     runs-on: self-hosted
 
     steps:
 
-      - name: Checkout Source
+      - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker Image
         run: |
-          docker build -t hangman:v1 .
+          docker build \
+          -t ghcr.io/${{ github.repository }}/hangman:latest .
 
-      - name: Save Docker Image
+      - name: Push Image
         run: |
-          docker save hangman:v1 -o hangman.tar
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: hangman-image
-          path: hangman.tar
+          docker push ghcr.io/${{ github.repository }}/hangman:latest
