@@ -33,7 +33,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-          -t ghcr.io/${{ github.repository }}/hangman:latest .
+          -t ghcr.io/${{ github.repository }}:latest .
 
       - name: Push Image
         run: |
