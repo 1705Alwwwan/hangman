@@ -9,13 +9,14 @@ permissions:
   contents: read
   packages: write
 
+env:
+  IMAGE_NAME: ghcr.io/1705alwwwan/hangman
+
 jobs:
   build:
-
     runs-on: self-hosted
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -36,15 +37,19 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-      - name: Update Kubernetes Deployment
+      - name: Apply Kubernetes Manifest
         run: |
           kubectl apply -f k3s/
 
+      - name: Update Deployment Image
+        run: |
           kubectl set image deployment/hangman \
-            hangman=ghcr.io/${{ github.repository }}:${{ github.sha }} \
-            -n hangman
+          hangman=${{ env.IMAGE_NAME }}:${{ github.sha }} \
+          -n hangman
 
+      - name: Wait Rollout
+        run: |
           kubectl rollout status deployment/hangman -n hangman
